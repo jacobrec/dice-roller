@@ -29,6 +29,7 @@
 
 
 (define (display-freq-graph options str freq max-width)
+  (define label-width 5)
   (define width (* 8 max-width))
   (define n ((if (is-option "graph-width" "full" options)
                  freq-get-most-prob freq-get-normalizer) freq))
@@ -42,7 +43,7 @@
          (define partial-type (- tiles (* 8 fulls)))
          (define header (number->string (car x)))
          (display header)
-         (display (make-string (- 5 (string-length header)) #\space))
+         (display (make-string (- label-width (string-length header)) #\space))
          (display (make-string fulls #\█))
          (display
            (case partial-type
