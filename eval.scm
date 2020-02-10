@@ -21,7 +21,6 @@
   (operation (dice-eval v1) (dice-eval v2)))
 
 (define (dice-eval expr)
-  (format #t "~A~%" expr)
   (cond
    ((number? expr) (freq-from-num expr))
    ((dice? expr) (freq-from-die expr))
