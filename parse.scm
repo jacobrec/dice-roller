@@ -1,7 +1,13 @@
 (define-module (jroller parse)
   #:use-module (jlib parse)
   #:use-module (srfi srfi-1)
-  #:export (parse))
+  #:export (parse
+            commands))
+
+(define commands '(("display" . ("graph" "alist"))
+                   ("title" . ("show" "hide"))
+                   ("percents" . ("show" "hide"))
+                   ("graph-width" . ("full" "relative"))))
 
 (define (parse/die)
  (parse/apply
@@ -46,13 +52,12 @@
 
 (define (parse/cmd)
   (parse/apply
-    (parse/or
-      (parse/optionset "display" '("alist" "graph"))
-      (parse/optionset "title" '("show" "hide"))
-      (parse/optionset "percents" '("show" "hide"))
-      (parse/optionset "graph-width" '("full" "relative")))
+    (apply parse/or
+           (map (λ(v)
+                  (parse/optionset (car v) (cdr v)))
+                commands))
     (λ (parsed)
-      (list "cmd" (first parsed) (third parsed)))))
+     (list "cmd" (first parsed) (third parsed)))))
 
 (define (parse)
   (parse/or

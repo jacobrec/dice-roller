@@ -40,8 +40,9 @@
          (define tiles (int (round (/ (* (cdr x) width) n))))
          (define fulls (int (/ tiles 8)))
          (define partial-type (- tiles (* 8 fulls)))
-         (display (int (car x)))
-         (display (make-string (int (- 4 (int (log10 (car x))))) #\space))
+         (define header (number->string (car x)))
+         (display header)
+         (display (make-string (- 5 (string-length header)) #\space))
          (display (make-string fulls #\█))
          (display
            (case partial-type
