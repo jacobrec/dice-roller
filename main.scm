@@ -44,10 +44,16 @@
          (format #t "  ~a={~a}~%" (car x) (string-join (cdr x) ",")))
        commands))
 
+(define (do-print-options options)
+  (format #t "Current Options:~%")
+  (map (λ (x)
+         (format #t "  ~A=~A~%" (car x) (cdr x)))
+       options))
+
 (define (do-stmt stmt)
   (cond
    ((string= stmt "help") (do-help))
-   ((string= stmt "options") (format #t "~A~%" options))
+   ((string= stmt "options") (do-print-options options))
    ((string= stmt "quit") (exit))
    ((string= stmt "exit") (exit))))
 

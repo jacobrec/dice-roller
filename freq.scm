@@ -14,9 +14,19 @@
             freq-sub
             freq-div))
 
+(define (get-die-options die)
+  (if (null? (caddr die))
+    (values #f #f)
+    (values (caaddr die) (cadar (cddr die)))))
+
 (define (freq-from-die die)
-  (define count (car die))
-  (define size  (cdr die))
+  (define count (caadr die))
+  (define size  (cdadr die))
+  (define-values (opt-type opt-size) (get-die-options die))
+  ; (display opt-type)
+  ; (display opt-size)
+  ; (display "\n")
+  ; TODO: figure out this math
   (reduce freq-add '()
    (map (λ (x) (map (λ (x) (cons x 1)) (iota size 1)))
         (iota count))))
