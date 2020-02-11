@@ -6,16 +6,22 @@
 
 (define commands '(("display" . ("graph" "alist"))
                    ("title" . ("show" "hide"))
+                   ("mode" . ("chance" "result"))
                    ("percents" . ("show" "hide"))
                    ("graph-width" . ("full" "relative"))))
+
+(define statements '("help" "quit" "exit" "options"))
 
 (define (parse/die)
  (parse/apply
   (parse/and (parse/int) (parse/lit "d") (parse/int))
-  (λ (p) (cons (car p) (caddr p)))))
+  (λ (p)
+    (if (and (> (car p) 0) (> (caddr p) 0))
+      (cons (car p) (caddr p))
+      'parse-error))))
 
 (define (parse/parens)
-  (parse/between (parse/lit "(") (parse/expr) (parse/lit ")")))
+ (parse/between (parse/lit "(") (parse/expr) (parse/lit ")")))
 
 (define (parse/obj)
   (parse/or
@@ -57,9 +63,28 @@
                   (parse/optionset (car v) (cdr v)))
                 commands))
     (λ (parsed)
-     (list "cmd" (first parsed) (third parsed)))))
+     (list 'cmd (first parsed) (third parsed)))))
+
+(define (parse/stmt)
+  (parse/apply
+    (apply parse/or_lit statements)
+    (λ (val) (list 'stmt val))))
+
+(define (parse/exprstmt)
+  (parse/apply
+    (parse/expr)
+    (λ (val) (list 'expr val))))
+
+(define (parse/val)
+  (parse/or (parse/cmd) (parse/stmt) (parse/exprstmt)))
 
 (define (parse)
-  (parse/or
-    (parse/cmd)
-    (parse/expr)))
+  (λ (str)
+    ((parse/or
+       (parse/apply
+         (parse/and (parse/val) (parse/lit ";") (parse))
+         (λ (x) (cons (first x) (third x))))
+       (parse/apply
+         (parse/and (parse/val) (parse/? (parse/lit ";")))
+         (λ (x) (list (car x)))))
+     str)))

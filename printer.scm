@@ -1,7 +1,8 @@
 (define-module (jroller printer)
   #:use-module (ice-9 pretty-print)
   #:use-module (jroller freq)
-  #:export (display-freq))
+  #:export (display-freq
+            is-option))
 
 (define (get-option op options)
   (cdr (assoc op options)))
@@ -12,23 +13,28 @@
 (define (display-freq options str freq)
   (when (is-option "title" "show" options)
     (hash-title str))
-  (let ((gt (get-option "display" options)))
-    (cond
-     ((is-option "display" "alist" options) (display-freq-pretty-print str freq))
-     ((is-option "display" "graph" options) (display-freq-graph
-                                             options str freq 80)))))
+  (if (is-option "mode" "chance" options)
+    (let ((gt (get-option "display" options)))
+      (cond
+       ((is-option "display" "alist" options) (display-freq-pretty-print freq))
+       ((is-option "display" "graph" options) (display-freq-graph
+                                               options freq 80))))
+    (display-evaled-freq freq)))
 
 (define (hash-title str)
   (display "### ")
   (display str)
   (display " ###\n"))
 
-(define (display-freq-pretty-print str freq)
+(define (display-evaled-freq freq)
+  (format #t " => ~A~%" (freq-eval freq)))
+
+(define (display-freq-pretty-print freq)
   (pretty-print freq)
   (display "\n"))
 
 
-(define (display-freq-graph options str freq max-width)
+(define (display-freq-graph options freq max-width)
   (define label-width 5)
   (define width (* 8 max-width))
   (define n ((if (is-option "graph-width" "full" options)

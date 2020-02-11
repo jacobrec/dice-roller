@@ -44,19 +44,30 @@
          (format #t "  ~a={~a}~%" (car x) (string-join (cdr x) ",")))
        commands))
 
-(define (handle-input input)
-  (define parsed ((parse) input))
+(define (do-stmt stmt)
   (cond
-   ((string= "help" input) (do-help))
-   ((string= "options" input) (format #t "~A~%" options))
+   ((string= stmt "help") (do-help))
+   ((string= stmt "options") (format #t "~A~%" options))))
+
+(define (handle-parsed-input input parsed-list)
+  (unless (null? parsed-list)
+    (let ((parsed (car parsed-list)))
+      (cond
+       ((eq? 'cmd (car parsed)) (do-option (cdr parsed)))
+       ((eq? 'stmt (car parsed)) (do-stmt (cadr parsed)))
+       ((eq? 'expr (car parsed)) (do-expr input (cadr parsed)))))
+    (handle-parsed-input input (cdr parsed-list))))
+
+(define (handle-input input)
+  (define-values (parsed str-left) ((parse) input))
+  (cond
+   ((not (= 0 (string-length str-left))) (do-error input))
    ((eq? 'parse-error parsed) (do-error input))
-   ((and (pair? parsed) (string? (car parsed)) (string= "cmd" (car parsed)))
-    (do-option (cdr parsed)))
-   (else (do-expr input parsed))))
+   (else (handle-parsed-input input parsed))))
 
 (define (main)
   (define input (readline "> "))
-  (unless (or (eof-object? input) (string= "exit" input) (string= "quit" input))
+  (unless (or (eof-object? input))
     (handle-input input)
     (main)))
 

@@ -4,6 +4,7 @@
 
             freq-get-normalizer
             freq-get-most-prob
+            freq-eval
 
             freq-from-die
             freq-from-num
@@ -81,3 +82,12 @@
                    (cdr fre))))
   (normalizer 1 freq))
 
+(define (freq-eval freq)
+  (define m (freq-get-normalizer freq))
+  (define r (random m))
+  (define (loop r freq)
+    (define val (car freq))
+    (if (< r (cdr val))
+      (car val)
+      (loop (- r (cdr val)) (cdr freq))))
+  (loop r freq))
