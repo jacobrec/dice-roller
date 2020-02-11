@@ -47,7 +47,9 @@
 (define (do-stmt stmt)
   (cond
    ((string= stmt "help") (do-help))
-   ((string= stmt "options") (format #t "~A~%" options))))
+   ((string= stmt "options") (format #t "~A~%" options))
+   ((string= stmt "quit") (exit))
+   ((string= stmt "exit") (exit))))
 
 (define (handle-parsed-input input parsed-list)
   (unless (null? parsed-list)
