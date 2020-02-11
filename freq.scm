@@ -1,5 +1,6 @@
 (define-module (jroller freq)
   #:use-module (srfi srfi-1)
+  #:use-module (jlib lists)
   #:export (freq-compress
 
             freq-get-normalizer
@@ -16,23 +17,38 @@
 
 (define (get-die-options die)
   (if (null? (caddr die))
-    (values #f #f)
+    (values "" 0)
     (values (caaddr die) (cadar (cddr die)))))
 
 (define (freq-from-die die)
   (define count (caadr die))
   (define size  (cdadr die))
   (define-values (opt-type opt-size) (get-die-options die))
-  ; (display opt-type)
-  ; (display opt-size)
-  ; (display "\n")
-  ; TODO: figure out this math
-  (reduce freq-add '()
-   (map (λ (x) (map (λ (x) (cons x 1)) (iota size 1)))
-        (iota count))))
+  (define tsize (if (or (string= "x" opt-type)
+                        (string= "X" opt-type))
+                    opt-size (- count opt-size)))
+  (define op (if (or (string= "X" opt-type) (string= "k" opt-type)) > <))
+  (if (= 0 opt-size)
+   (reduce freq-add '()
+    (map (λ (x) (map (λ (x) (cons x 1)) (iota size 1)))
+         (iota count)))
+   (freq-die-options count size tsize op)))
+
+(define (freq-die-options count size drop-size op)
+  (define res
+   (map (λ (p)
+         (define sorted (sort p (λ (a b) (op (car a) (car b)))))
+         (define sp (drop sorted drop-size))
+         (define prob (apply + (map cdr p)))
+         ;(format #t "prob: ~A | ~A -> ~A~%" prob p sp)
+         (map (λ (x) (cons (car x) (* (cdr x) prob))) sp))
+    (apply cartisian-product
+          (map (λ (x) (map (λ (x) (cons x 1)) (iota size 1))) (iota count)))))
+  (freq-compress
+   (map (λ (x) (apply freq-add-many (map (λ (y) (list y)) x))) res)))
 
 (define (freq-from-num num)
-  `((,num . 1)))
+ `((,num . 1)))
 
 (define (freq-compress f)
  (define res '())
@@ -77,6 +93,12 @@
 (define (freq-div f1 f2)
   (freq-binop f1 f2 /))
 
+
+(define (freq-add-many f1 . rest)
+  (define (fam f1 . rest)
+    (if (null? rest) f1
+      (apply fam (freq-add f1 (car rest)) (cdr rest))))
+  (car (apply fam f1 rest)))
 
 (define (freq-get-normalizer freq)
   (define (normalizer acc fre)
