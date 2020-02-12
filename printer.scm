@@ -18,7 +18,7 @@
       (cond
        ((is-option "display" "alist" options) (display-freq-pretty-print freq))
        ((is-option "display" "graph" options) (display-freq-graph
-                                               options freq 80))))
+                                               options freq 70))))
     (display-evaled-freq freq)))
 
 (define (hash-title str)
@@ -35,21 +35,35 @@
 
 
 (define (display-freq-graph options freq max-width)
-  (define label-width 5)
+  (define max-digits 4)
   (define width (* 8 max-width))
+  (define denom (freq-get-normalizer freq))
   (define n ((if (is-option "graph-width" "full" options)
                  freq-get-most-prob freq-get-normalizer) freq))
   (define freq2 (sort freq (λ (a b) (< (car a) (car b)))))
   (define (int num)
     (inexact->exact (truncate num)))
+  (define is-percent (is-option "percents" "show" options))
+  (define label-width (if is-percent 12 (+ 1 max-digits)))
 
   (map (λ(x)
+         (define percent (exact->inexact
+                          (/ (int (* 10000 (exact->inexact (/ (cdr x) denom)))) 100)))
          (define tiles (int (round (/ (* (cdr x) width) n))))
          (define fulls (int (/ tiles 8)))
          (define partial-type (- tiles (* 8 fulls)))
          (define header (number->string (car x)))
-         (display header)
-         (display (make-string (- label-width (string-length header)) #\space))
+         (define pheader (if is-percent (number->string percent) ""))
+         (if is-percent
+           (format #t "~A~A- ~A%" header
+                   (make-string (- max-digits (string-length header)) #\space)
+                   pheader)
+           (format #t "~A~A" header
+                   (make-string (- max-digits (string-length header)) #\space)))
+
+         (display (make-string (- label-width
+                                 (+ max-digits (string-length pheader)))
+                              #\space))
          (display (make-string fulls #\█))
          (display
            (case partial-type
