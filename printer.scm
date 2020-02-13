@@ -57,17 +57,9 @@
 (define (display-tiles tiles)
   (define fulls (int (/ tiles 8)))
   (define partial-type (- tiles (* 8 fulls)))
-  (display (make-string fulls #\█))
-  (display
-    (case partial-type ; TODO: make this vector access
-       ((0) #\space)
-       ((1) #\▏)
-       ((2) #\▎)
-       ((3) #\▍)
-       ((4) #\▌)
-       ((5) #\▋)
-       ((6) #\▊)
-       ((7) #\▉)))
+  (define chars #(#\space #\▏ #\▎ #\▍ #\▌ #\▋ #\▊ #\▉ #\█))
+  (display (make-string fulls (vector-ref chars 8)))
+  (display (vector-ref chars partial-type))
   (display "\n"))
 
 (define (display-freq-graph options freq max-width)
