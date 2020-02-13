@@ -4,11 +4,10 @@
   #:export (parse
             commands))
 
-(define commands '(("display" . ("graph" "alist"))
-                   ("title" . ("show" "hide"))
-                   ("mode" . ("chance" "result"))
-                   ("percents" . ("show" "hide"))
-                   ("graph-width" . ("full" "relative"))))
+(define commands '(("display"  . ("graph" "relative" "atleast" "atmost" "alist"))
+                   ("title"    . ("show" "hide"))
+                   ("mode"     . ("chance" "result"))
+                   ("percents" . ("show" "hide"))))
 
 (define statements '("help" "quit" "exit" "options"))
 
