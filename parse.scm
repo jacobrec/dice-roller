@@ -26,17 +26,16 @@
       (parse/? (parse/and
                 (parse/or_lit "k" "K" "x" "X")
                 (parse/int)))))
-  (parse/apply
-   parser
+  (parse/apply parser
    (λ (x)
      (cond
-      ((null? (cadr x)) (cons 'die x))
+      ((null? (cadr x)) (cons #:die x))
       ((and (not (= 0 (cadadr x)))
-            (> (caar x) (cadadr x))) (cons 'die x))
+            (> (caar x) (cadadr x))) (cons #:die x))
       (else 'parse-error)))))
 
 (define (parse/parens)
- (parse/between (parse/lit "(") (parse/expr) (parse/lit ")")))
+  (parse/between (parse/lit "(") (parse/expr) (parse/lit ")")))
 
 (define (parse/obj)
   (parse/or
@@ -78,17 +77,17 @@
                   (parse/optionset (car v) (cdr v)))
                 commands))
     (λ (parsed)
-     (list 'cmd (first parsed) (third parsed)))))
+     (list #:cmd (first parsed) (third parsed)))))
 
 (define (parse/stmt)
   (parse/apply
     (apply parse/or_lit statements)
-    (λ (val) (list 'stmt val))))
+    (λ (val) (list #:stmt val))))
 
 (define (parse/exprstmt)
   (parse/apply
     (parse/expr)
-    (λ (val) (list 'expr val))))
+    (λ (val) (list #:expr val))))
 
 (define (parse/val)
   (parse/or (parse/cmd) (parse/stmt) (parse/exprstmt)))

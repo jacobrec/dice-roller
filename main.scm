@@ -6,14 +6,11 @@
 (use-modules (ice-9 readline))
 (use-modules (ice-9 rdelim))
 
-#;
-(define options '(("display" . "graph")
-                  ("title" . "show")))
 (define options ((λ (commands)
-                   (define (inner cmds)
-                     (if (null? cmds) '()
-                      (acons (caar cmds) (cadar cmds) (inner (cdr cmds)))))
-                   (inner commands))
+                  (define (inner cmds)
+                    (if (null? cmds) '()
+                     (acons (caar cmds) (cadar cmds) (inner (cdr cmds)))))
+                  (inner commands))
                  commands))
 
 (define (do-expr str parsed)
@@ -61,9 +58,9 @@
   (unless (null? parsed-list)
     (let ((parsed (car parsed-list)))
       (cond
-       ((eq? 'cmd (car parsed)) (do-option (cdr parsed)))
-       ((eq? 'stmt (car parsed)) (do-stmt (cadr parsed)))
-       ((eq? 'expr (car parsed)) (do-expr input (cadr parsed)))))
+       ((eq? #:cmd (car parsed)) (do-option (cdr parsed)))
+       ((eq? #:stmt (car parsed)) (do-stmt (cadr parsed)))
+       ((eq? #:expr (car parsed)) (do-expr input (cadr parsed)))))
     (handle-parsed-input input (cdr parsed-list))))
 
 (define (handle-input input)
