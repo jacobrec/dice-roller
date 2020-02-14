@@ -15,48 +15,48 @@
       (assert-equal? 'parse-error
        ((parse/die) "3d0"))
       (assert-equal? 'parse-error
-       ((parse/die) "0d3")))
+            ((parse/die) "0d3")
 
-    (define-test (die-ops)
-      (assert-equal? '(#:die (3 . 6) ("k" 2))
-       ((parse/die-ops) "3d6k2"))
-      (assert-equal? '(#:die (3 . 6) ("x" 2))
-       ((parse/die-ops) "3d6x2"))
-      (assert-equal? '(#:die (3 . 6) ("K" 2))
-       ((parse/die-ops) "3d6K2"))
-      (assert-equal? '(#:die (3 . 6) ("X" 2))
-       ((parse/die-ops) "3d6X2"))
+         (define-test (die-ops)
+           (assert-equal? '(#:die (3 . 6) ("k" 2))
+            ((parse/die-ops) "3d6k2"))
+           (assert-equal? '(#:die (3 . 6) ("x" 2))
+            ((parse/die-ops) "3d6x2"
+             (assert-equal? '(#:die (3 . 6) ("K" 2))
+              ((parse/die-ops) "3d6K2"))
+             (assert-equal? '(#:die (3 . 6) ("X" 2))
+              ((parse/die-ops) "3d6X2"))
+             (assert-equal? 'parse-error
+              ((parse/die-ops) "3d6k0"))
+             (assert-equal? 'parse-error))
+            ((parse/die-ops) "3d6k3"
+             (assert-equal? 'parse-error))
+            ((parse/die-ops) "3d6k4")))
+
+         (define-test (parse-expr)
+           (assert-equal? '(1.0 "*" 3.0)
+                          ((parse/expr) " 1 * 3"))
+
+           (assert-equal? '((#:die (1 . 6) ()) "+" (#:die (1 . 6) ()))
+                          ((parse/expr) "1d6 + 1d6"))
+
+           (assert-equal? 'parse-error
+                          ((parse/expr) "(1 + 3"))
+
+           (assert-equal? ")"
+                          (receive (parsed res) ((parse/expr) "1 + 3)"))
+                        res))
+
+         (define-test (parse-command)))
+      (assert-equal? '((#:stmt "help"
+                        ((parse) "help")))
+
+       (define-test (parse-option)))
+      (assert-equal? '((#:cmd "mode" "result"
+                        ((parse) "mode=result")))
+
+       (define-test (parse)))
       (assert-equal? 'parse-error
-       ((parse/die-ops) "3d6k0"))
-      (assert-equal? 'parse-error
-       ((parse/die-ops) "3d6k3"))
-      (assert-equal? 'parse-error
-       ((parse/die-ops) "3d6k4")))
-
-    (define-test (parse-expr)
-      (assert-equal? '(1.0 "*" 3.0)
-                     ((parse/expr) " 1 * 3"))
-
-      (assert-equal? '((#:die (1 . 6) ()) "+" (#:die (1 . 6) ()))
-                     ((parse/expr) "1d6 + 1d6"))
-
-      (assert-equal? 'parse-error
-                     ((parse/expr) "(1 + 3"))
-
-      (assert-equal? ")"
-                     (receive (parsed res) ((parse/expr) "1 + 3)")
-                        res)))
-
-    (define-test (parse-command)
-      (assert-equal? '((#:stmt "help"))
-                     ((parse) "help")))
-
-    (define-test (parse-option)
-      (assert-equal? '((#:cmd "mode" "result"))
-                     ((parse) "mode=result")))
-
-    (define-test (parse)
-      (assert-equal? 'parse-error
-                     ((parse) "aaahhh"))
+                       ((parse) "aaahhh"))
       (assert-equal? '((#:expr 1.0))
                      ((parse) "1")))))
