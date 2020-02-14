@@ -30,8 +30,9 @@
    parser
    (λ (x)
      (cond
-      ((null? (cadr x)) (cons "die" x))
-      ((> (caar x) (cadadr x)) (cons "die" x))
+      ((null? (cadr x)) (cons 'die x))
+      ((and (not (= 0 (cadadr x)))
+            (> (caar x) (cadadr x))) (cons 'die x))
       (else 'parse-error)))))
 
 (define (parse/parens)

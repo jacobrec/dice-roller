@@ -4,9 +4,7 @@
   #:export (dice-eval))
 
 (define (dice? expr)
-  (and
-   (string? (car expr))
-   (string= "die" (car expr))))
+  (equal? 'die (car expr)))
 
 (define (dice-eval-expr expr)
   (define op (second expr))
