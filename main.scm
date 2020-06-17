@@ -6,6 +6,11 @@
 (use-modules (ice-9 readline))
 (use-modules (ice-9 rdelim))
 
+(let ((time (gettimeofday)))
+     (set! *random-state*
+           (seed->random-state (+ (car time)
+                                  (cdr time)))))
+
 (define options ((λ (commands)
                   (define (inner cmds)
                     (if (null? cmds) '()
